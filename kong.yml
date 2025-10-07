@@ -7,3 +7,10 @@ services:
         paths:
           - /users
         strip_path: false
+  - name: auths-service
+    url: http://host.docker.internal:3002
+    routes:
+      - name: auths-route
+        paths:
+          - /
+        strip_path: false
