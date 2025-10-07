@@ -1,0 +1,9 @@
+_format_version: "3.0"
+services:
+  - name: users-service
+    url: http://host.docker.internal:3001
+    routes:
+      - name: users-route
+        paths:
+          - /users
+        strip_path: false

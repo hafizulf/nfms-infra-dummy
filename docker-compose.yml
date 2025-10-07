@@ -1,0 +1,52 @@
+services:
+  kong:
+    image: kong/kong-gateway:latest
+    container_name: kong-gateway
+    restart: unless-stopped
+    volumes:
+      - ./kong.yml:/kong/declarative/kong.yml
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+    ports:
+      - "8000:8000"  # Proxy port (your frontend hits here, e.g., localhost:8000/users/:id)
+      - "8001:8001"  # Admin API (for querying config, curl localhost:8001)
+  postgres_nfms_user_service:
+    container_name: postgres_nfms_user_service
+    image: postgres:17
+    ports:
+      - "${USER_SERVICE_DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${USER_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVICE_DB_DATABASE}
+    volumes:
+      - nfms_user_service_data:/var/lib/postgresql/data
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.13-management
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"         # AMQP
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-/}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+
+volumes:
+  nfms_user_service_data:
+  rabbitmq_data:
