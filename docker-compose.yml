@@ -28,6 +28,17 @@ services:
       POSTGRES_DB: ${USER_SERVICE_DB_DATABASE}
     volumes:
       - nfms_user_service_data:/var/lib/postgresql/data
+  postgres_nfms_auth_service:
+    container_name: postgres_nfms_auth_service
+    image: postgres:17
+    ports:
+      - "${AUTH_SERVICE_DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${AUTH_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_SERVICE_DB_DATABASE}
+    volumes:
+      - nfms_auth_service_data:/var/lib/postgresql/data
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3.13-management
@@ -49,4 +60,5 @@ services:
 
 volumes:
   nfms_user_service_data:
+  nfms_auth_service_data:
   rabbitmq_data:
