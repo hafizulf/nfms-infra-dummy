@@ -14,3 +14,10 @@ services:
         paths:
           - /
         strip_path: false
+  - name: uploads-service
+    url: http://host.docker.internal:3003
+    routes:
+      - name: uploads-route
+        paths:
+          - /uploads
+        strip_path: false
